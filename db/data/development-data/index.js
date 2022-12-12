@@ -1,12 +1,6 @@
-const { Pool } = require("pg");
+categoryData = require("./categories.js");
+commentData = require("./comments.js");
+reviewData = require("./reviews.js");
+userData = require("./users.js");
 
-exports.categoryData = require("./categories.js");
-exports.commentData = require("./comments.js");
-exports.reviewData = require("./reviews.js");
-exports.userData = require("./users.js");
-
-if (!process.env.PGDATABASE) {
-  throw new Error("No PGDATABASE configured");
-}
-
-module.exports = new Pool();
+module.exports = { categoryData, commentData, reviewData, userData };
