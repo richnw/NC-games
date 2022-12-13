@@ -45,7 +45,6 @@ describe("GET /api/reviews", () => {
       .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
-        expect(reviews).toBeInstanceOf(Array);
         expect(reviews).toHaveLength(13);
         expect(reviews[0].comment_count).toEqual("0");
         expect(reviews[5].comment_count).toEqual("3");
@@ -66,17 +65,14 @@ describe("GET /api/reviews", () => {
         });
       });
   });
+  test("should respond with an array sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews[0].created_at).toEqual("2021-01-25T11:16:54.963Z");
+        expect(reviews[12].created_at).toEqual("1970-01-10T02:08:38.400Z");
+      });
+  });
 });
-
-// a reviews array of review objects, each of which should have the following properties:
-
-// owner
-// title
-// review_id
-// category
-// review_img_url
-// created_at
-// votes
-// designer
-// comment_count which is the total count of all the comments with this review_id - you should make use of queries to the database in order to achieve this.
-// the reviews should be sorted by date in descending order.
