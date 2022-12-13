@@ -6,4 +6,19 @@ function selectCategories() {
     .then((result) => result.rows);
 }
 
-module.exports = { selectCategories };
+function selectReview(review_id) {
+  return db
+    .query("SELECT * FROM reviews WHERE review_id = $1;", [review_id])
+    .then(({ rows }) => {
+      const review = rows[0];
+      if (!review) {
+        return Promise.reject({
+          status: 404,
+          msg: "There is no review with that ID number",
+        });
+      }
+      return review;
+    });
+}
+
+module.exports = { selectCategories, selectReview };

@@ -38,3 +38,33 @@ describe("GET /api/categories", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id", () => {
+  test("status:200, should respond with a review object corresponding to the ID requested", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.review).toEqual({
+          review_id: 2,
+          title: "Jenga",
+          designer: "Leslie Scott",
+          owner: "philippaclaire9",
+          review_img_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          review_body: "Fiddly fun for all the family",
+          category: "dexterity",
+          created_at: "2021-01-18T10:01:41.251Z",
+          votes: 5,
+        });
+      });
+  });
+  test("status:404 Should respond with ID number does not exist if passed an ID number not in database", () => {
+    return request(app)
+      .get("/api/reviews/9999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("There is no review with that ID number");
+      });
+  });
+});
