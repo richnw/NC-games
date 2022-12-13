@@ -59,12 +59,20 @@ describe("GET /api/reviews/:review_id", () => {
         });
       });
   });
-  test("status:404 Should respond with ID number does not exist if passed an ID number not in database", () => {
+  test("status:404 Should respond with 'There is no review with that ID number' if passed an ID number not in database", () => {
     return request(app)
       .get("/api/reviews/9999999")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toEqual("There is no review with that ID number");
+      });
+  });
+  test("status:400 Should respond with 'Invalid input' if passed something that is not a number", () => {
+    return request(app)
+      .get("/api/reviews/notAnId")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid input");
       });
   });
 });
