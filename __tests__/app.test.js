@@ -39,7 +39,7 @@ describe("GET /api/categories", () => {
   });
 });
 describe("GET /api/reviews", () => {
-  test("should respond with an array of review objects with the appropriate properties ", () => {
+  test("should respond with an array of review objects with the appropriate properties and the correct values for the comment count ", () => {
     return request(app)
       .get("/api/reviews")
       .expect(200)
@@ -47,6 +47,8 @@ describe("GET /api/reviews", () => {
         const { reviews } = body;
         expect(reviews).toBeInstanceOf(Array);
         expect(reviews).toHaveLength(13);
+        expect(reviews[0].comment_count).toEqual("0");
+        expect(reviews[5].comment_count).toEqual("3");
         reviews.forEach((review) => {
           expect(review).toEqual(
             expect.objectContaining({
@@ -54,11 +56,11 @@ describe("GET /api/reviews", () => {
               title: expect.any(String),
               review_id: expect.any(Number),
               category: expect.any(String),
-              review_image_url: expect.any(String),
-              created_at: expect.any(Date),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
               votes: expect.any(Number),
               designer: expect.any(String),
-              comment_count: expect.any(Number),
+              comment_count: expect.any(String),
             })
           );
         });

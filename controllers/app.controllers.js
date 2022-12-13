@@ -1,4 +1,4 @@
-const { selectCategories } = require("../models/app.models");
+const { selectCategories, selectReviews } = require("../models/app.models");
 
 function getCategories(req, res) {
   selectCategories().then((categories) => {
@@ -6,4 +6,10 @@ function getCategories(req, res) {
   });
 }
 
-module.exports = { getCategories };
+function getReviews(req, res) {
+  selectReviews().then((reviews) => {
+    res.status(200).send({ reviews });
+  });
+}
+
+module.exports = { getCategories, getReviews };

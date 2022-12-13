@@ -1,10 +1,11 @@
 const express = require("express");
-const { getCategories } = require("./controllers/app.controllers");
+const { getCategories, getReviews } = require("./controllers/app.controllers");
 const { handleInvalidPath } = require("./controllers/errors.controllers");
 
 const app = express();
 
 app.get("/api/categories", getCategories);
+app.get("/api/reviews", getReviews);
 
 app.all("*", handleInvalidPath);
 app.use((err, req, res) => {
