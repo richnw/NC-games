@@ -3,6 +3,7 @@ const app = require("../app");
 const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const connection = require("../db/connection");
+const sorted = require("jest-sorted");
 
 afterAll(() => connection.end());
 beforeEach(() => seed(testData));
@@ -62,6 +63,11 @@ describe("GET /api/reviews", () => {
               comment_count: expect.any(String),
             })
           );
+          expect(review).toEqual(
+            expect.not.objectContaining({
+              review_body: expect.any(String),
+            })
+          );
         });
       });
   });
@@ -71,8 +77,7 @@ describe("GET /api/reviews", () => {
       .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
-        expect(reviews[0].created_at).toEqual("2021-01-25T11:16:54.963Z");
-        expect(reviews[12].created_at).toEqual("1970-01-10T02:08:38.400Z");
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
