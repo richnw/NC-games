@@ -3,6 +3,7 @@ const app = require("../app");
 const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const connection = require("../db/connection");
+const sorted = require("jest-sorted");
 
 afterAll(() => connection.end());
 beforeEach(() => seed(testData));
@@ -39,7 +40,7 @@ describe("GET /api/categories", () => {
   });
 });
 
-describe.only("GET /api/reviews/:review_id", () => {
+describe("GET /api/reviews/:review_id", () => {
   test("status:200, should respond with a review object corresponding to the ID requested", () => {
     return request(app)
       .get("/api/reviews/2")
@@ -78,6 +79,48 @@ describe.only("GET /api/reviews/:review_id", () => {
   });
 });
 
+describe("GET /api/reviews", () => {
+  test("should respond with an array of review objects with the appropriate properties and the correct values for the comment count ", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(13);
+        expect(reviews[0].comment_count).toEqual("0");
+        expect(reviews[5].comment_count).toEqual("3");
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(String),
+            })
+          );
+          expect(review).toEqual(
+            expect.not.objectContaining({
+              review_body: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("should respond with an array sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
 describe("GET /api/reviews/:review_id/comments", () => {
   test("status:200 Should respond with an array of comments with the appropriate properties ", () => {
     return request(app)
