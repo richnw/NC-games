@@ -21,4 +21,12 @@ function selectReview(review_id) {
     });
 }
 
-module.exports = { selectCategories, selectReview };
+function selectComments(review_id) {
+  return db
+    .query("SELECT * FROM comments WHERE review_id = $1;", [review_id])
+    .then(({ rows }) => {
+      return rows;
+    });
+}
+
+module.exports = { selectCategories, selectReview, selectComments };

@@ -39,24 +39,25 @@ describe("GET /api/categories", () => {
   });
 });
 
-describe("GET /api/reviews/:review_id", () => {
+describe.only("GET /api/reviews/:review_id", () => {
   test("status:200, should respond with a review object corresponding to the ID requested", () => {
     return request(app)
       .get("/api/reviews/2")
       .expect(200)
       .then(({ body }) => {
-        expect(body.review).toEqual({
-          review_id: 2,
-          title: "Jenga",
-          designer: "Leslie Scott",
-          owner: "philippaclaire9",
-          review_img_url:
-            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-          review_body: "Fiddly fun for all the family",
-          category: "dexterity",
-          created_at: "2021-01-18T10:01:41.251Z",
-          votes: 5,
-        });
+        expect(body.review).toEqual(
+          expect.objectContaining({
+            review_id: 2,
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_img_url: expect.any(String),
+            review_body: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
       });
   });
   test("status:404 Should respond with 'There is no review with that ID number' if passed an ID number not in database", () => {
@@ -73,6 +74,29 @@ describe("GET /api/reviews/:review_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual("Invalid input");
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("status:200 Should respond with an array of comments with the appropriate properties ", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveLength(3);
+        body.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: expect.any(Number),
+            })
+          );
+        });
       });
   });
 });
