@@ -4,6 +4,7 @@ const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const connection = require("../db/connection");
 const sorted = require("jest-sorted");
+const { expect } = require("@jest/globals");
 
 afterAll(() => connection.end());
 beforeEach(() => seed(testData));
@@ -36,45 +37,6 @@ describe("GET /api/categories", () => {
             })
           );
         });
-      });
-  });
-});
-
-describe("GET /api/reviews/:review_id", () => {
-  test("status:200, should respond with a review object corresponding to the ID requested", () => {
-    return request(app)
-      .get("/api/reviews/2")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.review).toEqual(
-          expect.objectContaining({
-            review_id: 2,
-            title: expect.any(String),
-            designer: expect.any(String),
-            owner: expect.any(String),
-            review_img_url: expect.any(String),
-            review_body: expect.any(String),
-            category: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-          })
-        );
-      });
-  });
-  test("status:404 Should respond with 'There is no review with that ID number' if passed an ID number not in database", () => {
-    return request(app)
-      .get("/api/reviews/9999999")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toEqual("There is no review with that ID number");
-      });
-  });
-  test("status:400 Should respond with 'Invalid input' if passed something that is not a number", () => {
-    return request(app)
-      .get("/api/reviews/notAnId")
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toEqual("Invalid input");
       });
   });
 });
@@ -121,6 +83,46 @@ describe("GET /api/reviews", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id", () => {
+  test("status:200, should respond with a review object corresponding to the ID requested", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.review).toEqual(
+          expect.objectContaining({
+            review_id: 2,
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_img_url: expect.any(String),
+            review_body: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+          })
+        );
+      });
+  });
+  test("status:404 Should respond with 'There is no review with that ID number' if passed an ID number not in database", () => {
+    return request(app)
+      .get("/api/reviews/9999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test("status:400 Should respond with 'Invalid input' if passed something that is not a number", () => {
+    return request(app)
+      .get("/api/reviews/notAnId")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid input");
+      });
+  });
+});
+
 describe("GET /api/reviews/:review_id/comments", () => {
   test("status:200 Should respond with an array of comments with the appropriate properties ", () => {
     return request(app)
@@ -140,6 +142,40 @@ describe("GET /api/reviews/:review_id/comments", () => {
             })
           );
         });
+      });
+  });
+  test("status:200 The array of comments should be sorted in date order with the most recent first", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body);
+        expect(body).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("status:200 Should respond with an empty array if that review has no comments", () => {
+    return request(app)
+      .get("/api/reviews/4/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveLength(0);
+      });
+  });
+  test('status:400 Should respond with "Invalid input" if passed a review ID that is not a number', () => {
+    return request(app)
+      .get("/api/reviews/notAnId/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid input");
+      });
+  });
+  test("status:404 Should respond 'There is no review with that ID number' if passed an ID number not in the database", () => {
+    return request(app)
+      .get("/api/reviews/9999999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
       });
   });
 });

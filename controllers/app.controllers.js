@@ -13,7 +13,7 @@ function getCategories(req, res, next) {
     .catch(next);
 }
 
-function getReview(req, res, next) {
+function getReviewById(req, res, next) {
   const { review_id } = req.params;
   selectReview(review_id)
     .then((review) => res.status(200).send({ review }))
@@ -22,11 +22,12 @@ function getReview(req, res, next) {
 
 function getComments(req, res, next) {
   const { review_id } = req.params;
-  selectComments(review_id).then((comments) => res.status(200).send(comments));
+  selectComments(review_id)
+    .then((comments) => res.status(200).send(comments))
+    .catch(next);
 }
 
 function getReviews(req, res, next) {
-  console.log("in CONTROLLER");
   selectReviews()
     .then((reviews) => {
       res.status(200).send({ reviews });
@@ -34,4 +35,4 @@ function getReviews(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getCategories, getReview, getComments, getReviews };
+module.exports = { getCategories, getReviewById, getComments, getReviews };
