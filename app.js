@@ -17,10 +17,10 @@ app.get("/api/categories", getCategories);
 app.get("/api/reviews/:review_id", getReviewById);
 app.get("/api/reviews/:review_id/comments", getCommentsById);
 app.get("/api/reviews", getReviews);
+app.all("*", handleInvalidPath);
 
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
-app.all("*", handleInvalidPath);
 app.use((err, req, res) => {
   console.log(err);
   res.status(500).send({ msg: "Server Error!" });
