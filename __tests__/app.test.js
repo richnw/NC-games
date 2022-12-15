@@ -128,8 +128,9 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/2/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toHaveLength(3);
-        body.forEach((comment) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(3);
+        comments.forEach((comment) => {
           expect(comment).toEqual(
             expect.objectContaining({
               comment_id: expect.any(Number),
@@ -148,7 +149,8 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/2/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toBeSortedBy("created_at", { descending: true });
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
   test("status:200 Should respond with an empty array if that review has no comments", () => {
@@ -156,7 +158,8 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/4/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body).toHaveLength(0);
+        const { comments } = body;
+        expect(comments).toHaveLength(0);
       });
   });
   test('status:400 Should respond with "Invalid input" if passed a review ID that is not a number', () => {
