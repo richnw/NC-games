@@ -20,7 +20,7 @@ function getReviewById(req, res, next) {
     .catch(next);
 }
 
-function getComments(req, res, next) {
+function getCommentsById(req, res, next) {
   const { review_id } = req.params;
   selectComments(review_id)
     .then((comments) => res.status(200).send(comments))
@@ -35,4 +35,4 @@ function getReviews(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getCategories, getReviewById, getComments, getReviews };
+module.exports = { getCategories, getReviewById, getCommentsById, getReviews };

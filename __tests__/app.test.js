@@ -4,7 +4,6 @@ const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const connection = require("../db/connection");
 const sorted = require("jest-sorted");
-const { expect } = require("@jest/globals");
 
 afterAll(() => connection.end());
 beforeEach(() => seed(testData));
@@ -138,7 +137,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
               created_at: expect.any(String),
               author: expect.any(String),
               body: expect.any(String),
-              review_id: expect.any(Number),
+              review_id: 2,
             })
           );
         });
@@ -149,11 +148,9 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .get("/api/reviews/2/comments")
       .expect(200)
       .then(({ body }) => {
-        console.log(body);
         expect(body).toBeSortedBy("created_at", { descending: true });
       });
   });
-
   test("status:200 Should respond with an empty array if that review has no comments", () => {
     return request(app)
       .get("/api/reviews/4/comments")

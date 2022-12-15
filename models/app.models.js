@@ -28,14 +28,14 @@ function selectReviews() {
 }
 
 const selectComments = async (review_id) => {
-  const dbOutput = await db.query(
+  const { rows } = await db.query(
     "SELECT * FROM comments WHERE review_id = $1 ORDER BY comments.created_at DESC;",
     [review_id]
   );
-  if (!dbOutput.rows.length) {
+  if (!rows.length) {
     return checkExists("reviews", "review_id", review_id);
   }
-  return dbOutput.rows;
+  return rows;
 };
 
 module.exports = {
