@@ -1,9 +1,22 @@
 const db = require("../db/connection");
+const { checkExists } = require("../db/seeds/utils");
 
 function selectCategories() {
   return db
     .query("SELECT slug, description FROM categories;")
     .then((result) => result.rows);
+}
+
+function selectReview(review_id) {
+  return db
+    .query("SELECT * FROM reviews WHERE review_id = $1;", [review_id])
+    .then(({ rows }) => {
+      const review = rows[0];
+      if (!review) {
+        return checkExists("reviews", "review_id", review_id);
+      }
+      return review;
+    });
 }
 
 function selectReviews() {
@@ -14,4 +27,20 @@ function selectReviews() {
     .then((result) => result.rows);
 }
 
-module.exports = { selectCategories, selectReviews };
+const selectComments = async (review_id) => {
+  const { rows } = await db.query(
+    "SELECT * FROM comments WHERE review_id = $1 ORDER BY comments.created_at DESC;",
+    [review_id]
+  );
+  if (!rows.length) {
+    return checkExists("reviews", "review_id", review_id);
+  }
+  return rows;
+};
+
+module.exports = {
+  selectCategories,
+  selectReview,
+  selectComments,
+  selectReviews,
+};
