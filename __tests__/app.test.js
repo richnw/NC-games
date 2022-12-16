@@ -104,7 +104,7 @@ describe("GET /api/reviews/:review_id", () => {
         );
       });
   });
-  test("status:404 Should respond with 'There is no review with that ID number' if passed an ID number not in database", () => {
+  test("status:404 Should respond with 'Resource not found' if passed an ID number not in database", () => {
     return request(app)
       .get("/api/reviews/9999999")
       .expect(404)
@@ -176,6 +176,79 @@ describe("GET /api/reviews/:review_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toEqual("Resource not found");
+      });
+  });
+});
+
+describe("POST /api/reviews/:review_id/comments", () => {
+  test("status:201 should return the comment", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "terrible",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual(
+          expect.objectContaining({
+            body: "terrible",
+            review_id: 1,
+            author: "dav3rid",
+            comment_id: expect.any(Number),
+            created_at: expect.any(String),
+            votes: 0,
+          })
+        );
+      });
+  });
+  test('status:400 Should return "missing required fields" if the request body of the comment is malformed or is missing required fields', () => {
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Missing required fields");
+      });
+  });
+  test('status:404 Should return "Resource not found" if the username is not in the database', () => {
+    const newComment = {
+      username: "notUser",
+      body: "terrible",
+    };
+    return request(app)
+      .post("/api/reviews/1/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test('status:404 Should return "Resource not found" if there is no review with that ID', () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "terrible",
+    };
+    return request(app)
+      .post("/api/reviews/99999999/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test("Status:400 Should return 'Invalid input' if passed something that is not a number for a review ID", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "terrible",
+    };
+    return request(app)
+      .post("/api/reviews/notNumber/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid input");
       });
   });
 });

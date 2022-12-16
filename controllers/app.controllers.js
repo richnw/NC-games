@@ -3,6 +3,7 @@ const {
   selectReview,
   selectComments,
   selectReviews,
+  insertComment,
 } = require("../models/app.models");
 
 function getCategories(req, res, next) {
@@ -35,4 +36,18 @@ function getReviews(req, res, next) {
     .catch(next);
 }
 
-module.exports = { getCategories, getReviewById, getCommentsById, getReviews };
+function postComment(req, res, next) {
+  const { username, body } = req.body;
+  const { review_id } = req.params;
+  insertComment(username, body, review_id)
+    .then((comment) => res.status(201).send({ comment }))
+    .catch(next);
+}
+
+module.exports = {
+  getCategories,
+  getReviewById,
+  getCommentsById,
+  getReviews,
+  postComment,
+};
