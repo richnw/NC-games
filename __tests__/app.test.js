@@ -212,13 +212,40 @@ describe("POST /api/reviews/:review_id/comments", () => {
         expect(body.msg).toEqual("Missing required fields");
       });
   });
-  test('status: 400 Should return "Invalid input" if the body or username of the request body is not a string ', () => {
+  test('status:404 Should return "Resource not found" if the username is not in the database', () => {
+    const newComment = {
+      username: "notUser",
+      body: "terrible",
+    };
     return request(app)
       .post("/api/reviews/1/comments")
-      .send({
-        username: 1,
-        body: 1,
-      })
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test('status:404 Should return "Resource not found" if there is no review with that ID', () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "terrible",
+    };
+    return request(app)
+      .post("/api/reviews/99999999/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test("Status:400 Should return 'Invalid input' if passed something that is not a number for a review ID", () => {
+    const newComment = {
+      username: "dav3rid",
+      body: "terrible",
+    };
+    return request(app)
+      .post("/api/reviews/notNumber/comments")
+      .send(newComment)
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toEqual("Invalid input");

@@ -47,10 +47,20 @@ function insertComment(username, body, review_id) {
     .then(({ rows }) => rows[0]);
 }
 
+function updateReview(inc_votes, review_id) {
+  return db
+    .query(
+      "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
+      [inc_votes, review_id]
+    )
+    .then(({ rows }) => rows[0]);
+}
+
 module.exports = {
   selectCategories,
   selectReview,
   selectComments,
   selectReviews,
   insertComment,
+  updateReview,
 };
