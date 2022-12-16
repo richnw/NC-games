@@ -353,3 +353,20 @@ describe("GET /api/users", () => {
       });
   });
 });
+describe("GET /api/reviews (queries)", () => {
+  test("should return reviews of the category specified in the query", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              category: "dexterity",
+            })
+          );
+        });
+      });
+  });
+});

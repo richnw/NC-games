@@ -31,7 +31,8 @@ function getCommentsById(req, res, next) {
 }
 
 function getReviews(req, res, next) {
-  selectReviews()
+  const category = req.query.category;
+  selectReviews(category)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
