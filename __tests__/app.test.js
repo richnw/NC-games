@@ -306,3 +306,23 @@ describe("PATCH /api/reviews/:review_id", () => {
       });
   });
 });
+describe("GET /api/users", () => {
+  test("Status: 200 Should return an array of user objects with the correct prooperties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
