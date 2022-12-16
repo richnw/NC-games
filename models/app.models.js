@@ -56,7 +56,10 @@ function updateReview(inc_votes, review_id) {
     .then(({ rows }) => {
       const review = rows[0];
       if (!review) {
-        return checkExists("reviews", "review_id", review_id);
+        return Promise.reject({
+          status: 404,
+          msg: "Resource not found",
+        });
       }
       return review;
     });
