@@ -65,6 +65,10 @@ function updateReview(inc_votes, review_id) {
     });
 }
 
+function selectUsers() {
+  return db.query("SELECT * FROM users;").then((result) => result.rows);
+}
+
 module.exports = {
   selectCategories,
   selectReview,
@@ -72,4 +76,5 @@ module.exports = {
   selectReviews,
   insertComment,
   updateReview,
+  selectUsers,
 };

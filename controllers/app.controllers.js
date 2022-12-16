@@ -5,6 +5,7 @@ const {
   selectReviews,
   insertComment,
   updateReview,
+  selectUsers,
 } = require("../models/app.models");
 
 function getCategories(req, res, next) {
@@ -53,6 +54,14 @@ function patchReview(req, res, next) {
     .catch(next);
 }
 
+function getUsers(req, res, next) {
+  selectUsers()
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch(next);
+}
+
 module.exports = {
   getCategories,
   getReviewById,
@@ -60,4 +69,5 @@ module.exports = {
   getReviews,
   postComment,
   patchReview,
+  getUsers,
 };
