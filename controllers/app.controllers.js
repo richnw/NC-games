@@ -4,6 +4,7 @@ const {
   selectComments,
   selectReviews,
   insertComment,
+  updateReview,
 } = require("../models/app.models");
 
 function getCategories(req, res, next) {
@@ -44,10 +45,19 @@ function postComment(req, res, next) {
     .catch(next);
 }
 
+function patchReview(req, res, next) {
+  const { inc_votes } = req.body;
+  const { review_id } = req.params;
+  updateReview(inc_votes, review_id)
+    .then((review) => res.status(200).send({ review }))
+    .catch(next);
+}
+
 module.exports = {
   getCategories,
   getReviewById,
   getCommentsById,
   getReviews,
   postComment,
+  patchReview,
 };

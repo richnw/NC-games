@@ -53,7 +53,16 @@ function updateReview(inc_votes, review_id) {
       "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
       [inc_votes, review_id]
     )
-    .then(({ rows }) => rows[0]);
+    .then(({ rows }) => {
+      const review = rows[0];
+      if (!review) {
+        return Promise.reject({
+          status: 404,
+          msg: "Resource not found",
+        });
+      }
+      return review;
+    });
 }
 
 module.exports = {
