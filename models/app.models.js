@@ -53,7 +53,13 @@ function updateReview(inc_votes, review_id) {
       "UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING *;",
       [inc_votes, review_id]
     )
-    .then(({ rows }) => rows[0]);
+    .then(({ rows }) => {
+      const review = rows[0];
+      if (!review) {
+        return checkExists("reviews", "review_id", review_id);
+      }
+      return review;
+    });
 }
 
 module.exports = {

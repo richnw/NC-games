@@ -170,7 +170,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
         expect(body.msg).toEqual("Invalid input");
       });
   });
-  test("status:404 Should respond 'There is no review with that ID number' if passed an ID number not in the database", () => {
+  test("status:404 Should respond 'Resource not found' if passed an ID number not in the database", () => {
     return request(app)
       .get("/api/reviews/9999999/comments")
       .expect(404)
@@ -246,6 +246,63 @@ describe("PATCH /api/reviews/:review_id", () => {
             votes: 2,
           })
         );
+      });
+  });
+  test("should return an object with a decreased number of votes when passed a negative number", () => {
+    return request(app)
+      .patch("/api/reviews/2")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.review).toEqual(
+          expect.objectContaining({
+            review_id: 2,
+            title: expect.any(String),
+            designer: expect.any(String),
+            owner: expect.any(String),
+            review_img_url: expect.any(String),
+            review_body: expect.any(String),
+            category: expect.any(String),
+            created_at: expect.any(String),
+            votes: 4,
+          })
+        );
+      });
+  });
+  test("Status: 404 should return 'Resource not found' if given a review_id that is not in the database", () => {
+    return request(app)
+      .patch("/api/reviews/99999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Resource not found");
+      });
+  });
+  test('Status: 400 Should return "Invalid input" if it is passed a review ID that is not a number', () => {
+    return request(app)
+      .patch("/api/reviews/notNumber")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid input");
+      });
+  });
+  test('Status: 400 Should return "Invalid input" if it is passed something that is not a number in incVotes', () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ inc_votes: "notNumber" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid input");
+      });
+  });
+  test('Status: 400 Should return "Missing required fields" if it is passed something that is not incVotes with a number', () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ incorrect: 6 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Missing required fields");
       });
   });
 });
