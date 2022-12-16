@@ -369,4 +369,13 @@ describe("GET /api/reviews (queries)", () => {
         });
       });
   });
+  // test("should sort the reviews by any valid column defaulting to date", () => {
+  //   return request(app)
+  //     .get("/api/reviews?sort_by=category")
+  //     .expect(200)
+  //     .then(({ body }) => {
+  //       const { reviews } = body;
+  //       expect(reviews).toBeSortedBy("category", { descending: true });
+  //     });
+  // });
 });
