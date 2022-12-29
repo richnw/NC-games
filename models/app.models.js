@@ -19,7 +19,29 @@ function selectReview(review_id) {
     });
 }
 
-function selectReviews(category, sortBy = "created_at", order = "desc") {
+const selectReviews = async (
+  category,
+  sortBy = "created_at",
+  order = "desc"
+) => {
+  if (
+    ![
+      "title",
+      "designer",
+      "owner",
+      "review_img_url",
+      "review_body",
+      "category",
+      "created_at",
+      "votes",
+    ].includes(sortBy)
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+
   let queryString =
     "SELECT reviews.review_id, reviews.created_at, reviews.votes, owner, title, category, review_img_url, designer, COUNT(comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id ";
   let queryString2 = `GROUP BY reviews.review_id, comments.review_id ORDER BY ${sortBy} ${order};`;
@@ -29,8 +51,12 @@ function selectReviews(category, sortBy = "created_at", order = "desc") {
     queryValues.push(category);
   }
   queryString += queryString2;
-  return db.query(queryString, queryValues).then((result) => result.rows);
-}
+  const { rows } = await db.query(queryString, queryValues);
+  if (!rows.length) {
+    return checkExists("reviews", category);
+  }
+  return rows;
+};
 
 const selectComments = async (review_id) => {
   const { rows } = await db.query(
