@@ -369,13 +369,36 @@ describe("GET /api/reviews (queries)", () => {
         });
       });
   });
-  // test("should sort the reviews by any valid column defaulting to date", () => {
-  //   return request(app)
-  //     .get("/api/reviews?sort_by=category")
-  //     .expect(200)
-  //     .then(({ body }) => {
-  //       const { reviews } = body;
-  //       expect(reviews).toBeSortedBy("category", { descending: true });
-  //     });
-  // });
+  test("should sort the reviews by any valid column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=designer")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(13);
+        expect(reviews).toBeSortedBy("designer", { descending: true });
+      });
+  });
+  test("should default to sorting by date if no column is given ", () => {
+    return request(app)
+      .get("/api/reviews?category=social%20deduction")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("should also allow an order query which can be ascending or descending", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
 });

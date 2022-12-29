@@ -19,11 +19,10 @@ function selectReview(review_id) {
     });
 }
 
-function selectReviews(category) {
+function selectReviews(category, sortBy = "created_at", order = "desc") {
   let queryString =
     "SELECT reviews.review_id, reviews.created_at, reviews.votes, owner, title, category, review_img_url, designer, COUNT(comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id ";
-  let queryString2 =
-    "GROUP BY reviews.review_id, comments.review_id ORDER BY reviews.created_at DESC;";
+  let queryString2 = `GROUP BY reviews.review_id, comments.review_id ORDER BY ${sortBy} ${order};`;
   const queryValues = [];
   if (category) {
     queryString += "WHERE category = $1 ";
