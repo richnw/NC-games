@@ -9,7 +9,10 @@ function selectCategories() {
 
 function selectReview(review_id) {
   return db
-    .query("SELECT * FROM reviews WHERE review_id = $1;", [review_id])
+    .query(
+      "SELECT DISTINCT reviews.review_id, reviews.title, reviews.review_body, reviews.designer, reviews.review_img_url, reviews.votes, reviews.category, reviews.owner, reviews.created_at, COUNT(comments.comment_id) AS comment_count FROM reviews JOIN comments ON reviews.review_id = comments.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id;",
+      [review_id]
+    )
     .then(({ rows }) => {
       const review = rows[0];
       if (!review) {
@@ -100,6 +103,10 @@ function selectUsers() {
   return db.query("SELECT * FROM users;").then((result) => result.rows);
 }
 
+function removeComment(comment_id) {
+  return db.query("DELETE FROM comments WHERE comment_id = $1;", [comment_id]);
+}
+
 module.exports = {
   selectCategories,
   selectReview,
@@ -108,4 +115,5 @@ module.exports = {
   insertComment,
   updateReview,
   selectUsers,
+  removeComment,
 };
