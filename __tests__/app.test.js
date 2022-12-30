@@ -446,3 +446,24 @@ describe("GET /api/reviews (queries)", () => {
       });
   });
 });
+
+describe("GET /api/reviews/:review_id (comment count)", () => {
+  test("the review object should contain a comment count", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.review).toEqual(
+          expect.objectContaining({
+            review_id: 2,
+            comment_count: "3",
+          })
+        );
+      });
+  });
+});
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should delete the given comment, give a status 204 and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+});
