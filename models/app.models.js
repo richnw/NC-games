@@ -37,6 +37,7 @@ const selectReviews = async (
       "category",
       "created_at",
       "votes",
+      "comment_count",
     ].includes(sortBy)
   ) {
     return Promise.reject({ status: 400, msg: "Invalid sort query" });
