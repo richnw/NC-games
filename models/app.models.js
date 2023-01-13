@@ -46,7 +46,7 @@ const selectReviews = async (
   }
 
   let queryString =
-    "SELECT reviews.review_id, reviews.created_at, reviews.votes, owner, title, category, review_img_url, designer, COUNT(comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id ";
+    "SELECT reviews.review_id, reviews.created_at, reviews.votes, owner, title, category, review_img_url, designer, COUNT(comment_id)::int AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id ";
   let queryString2 = `GROUP BY reviews.review_id, comments.review_id ORDER BY ${sortBy} ${order};`;
   const queryValues = [];
   if (category) {
@@ -60,7 +60,6 @@ const selectReviews = async (
   }
   return rows;
 };
-
 
 const selectComments = async (review_id) => {
   const { rows } = await db.query(
