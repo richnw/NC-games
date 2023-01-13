@@ -61,6 +61,7 @@ const selectReviews = async (
   return rows;
 };
 
+
 const selectComments = async (review_id) => {
   const { rows } = await db.query(
     "SELECT * FROM comments WHERE review_id = $1 ORDER BY comments.created_at DESC;",
