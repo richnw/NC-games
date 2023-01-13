@@ -5,6 +5,8 @@ const {
   selectReviews,
   insertComment,
   updateReview,
+  selectUsers,
+  removeComment,
 } = require("../models/app.models");
 
 function getCategories(req, res, next) {
@@ -30,7 +32,10 @@ function getCommentsById(req, res, next) {
 }
 
 function getReviews(req, res, next) {
-  selectReviews()
+  const category = req.query.category;
+  const sortBy = req.query.sort_by;
+  const order = req.query.order;
+  selectReviews(category, sortBy, order)
     .then((reviews) => {
       res.status(200).send({ reviews });
     })
@@ -53,6 +58,19 @@ function patchReview(req, res, next) {
     .catch(next);
 }
 
+function getUsers(req, res, next) {
+  selectUsers()
+    .then((users) => {
+      res.status(200).send({ users });
+    })
+    .catch(next);
+}
+
+function deleteComment(req, res, next) {
+  const { comment_id } = req.params;
+  removeComment(comment_id).then(() => res.status(204).send());
+}
+
 module.exports = {
   getCategories,
   getReviewById,
@@ -60,4 +78,6 @@ module.exports = {
   getReviews,
   postComment,
   patchReview,
+  getUsers,
+  deleteComment,
 };

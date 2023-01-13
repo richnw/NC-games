@@ -9,7 +9,10 @@ function selectCategories() {
 
 function selectReview(review_id) {
   return db
-    .query("SELECT * FROM reviews WHERE review_id = $1;", [review_id])
+    .query(
+      "SELECT DISTINCT reviews.review_id, reviews.title, reviews.review_body, reviews.designer, reviews.review_img_url, reviews.votes, reviews.category, reviews.owner, reviews.created_at, COUNT(comments.comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id;",
+      [review_id]
+    )
     .then(({ rows }) => {
       const review = rows[0];
       if (!review) {
@@ -19,13 +22,45 @@ function selectReview(review_id) {
     });
 }
 
-function selectReviews() {
-  return db
-    .query(
-      "SELECT reviews.review_id, reviews.created_at, reviews.votes, owner, title, category, review_img_url, designer, COUNT(comment_id)::int AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id GROUP BY reviews.review_id, comments.review_id ORDER BY reviews.created_at DESC;"
-    )
-    .then((result) => result.rows);
-}
+const selectReviews = async (
+  category,
+  sortBy = "created_at",
+  order = "desc"
+) => {
+  if (
+    ![
+      "title",
+      "designer",
+      "owner",
+      "review_img_url",
+      "review_body",
+      "category",
+      "created_at",
+      "votes",
+    ].includes(sortBy)
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
+
+  let queryString =
+    "SELECT reviews.review_id, reviews.created_at, reviews.votes, owner, title, category, review_img_url, designer, COUNT(comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id ";
+  let queryString2 = `GROUP BY reviews.review_id, comments.review_id ORDER BY ${sortBy} ${order};`;
+  const queryValues = [];
+  if (category) {
+    queryString += "WHERE category = $1 ";
+    queryValues.push(category);
+  }
+  queryString += queryString2;
+  const { rows } = await db.query(queryString, queryValues);
+  if (!rows.length) {
+    return checkExists("reviews", category);
+  }
+  return rows;
+};
+
 
 const selectComments = async (review_id) => {
   const { rows } = await db.query(
@@ -65,6 +100,14 @@ function updateReview(inc_votes, review_id) {
     });
 }
 
+function selectUsers() {
+  return db.query("SELECT * FROM users;").then((result) => result.rows);
+}
+
+function removeComment(comment_id) {
+  return db.query("DELETE FROM comments WHERE comment_id = $1;", [comment_id]);
+}
+
 module.exports = {
   selectCategories,
   selectReview,
@@ -72,4 +115,6 @@ module.exports = {
   selectReviews,
   insertComment,
   updateReview,
+  selectUsers,
+  removeComment,
 };

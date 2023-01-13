@@ -333,3 +333,137 @@ describe("PATCH /api/reviews/:review_id", () => {
       });
   });
 });
+describe("GET /api/users", () => {
+  test("Status: 200 Should return an array of user objects with the correct prooperties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
+describe("GET /api/reviews (queries)", () => {
+  test("should return reviews of the category specified in the query", () => {
+    return request(app)
+      .get("/api/reviews?category=dexterity")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              category: "dexterity",
+            })
+          );
+        });
+      });
+  });
+  test("should sort the reviews by any valid column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=designer")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toHaveLength(13);
+        expect(reviews).toBeSortedBy("designer", { descending: true });
+      });
+  });
+  test("should default to sorting by date if no column is given ", () => {
+    return request(app)
+      .get("/api/reviews?category=social%20deduction")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: true,
+        });
+      });
+  });
+  test("should also allow an order query which can be ascending or descending", () => {
+    return request(app)
+      .get("/api/reviews?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {
+          descending: false,
+        });
+      });
+  });
+  test("should accept multiple queries", () => {
+    return request(app)
+      .get(
+        "/api/reviews?category=social%20deduction&sort_by=designer&order=asc"
+      )
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("designer", {
+          descending: false,
+        });
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              category: "social deduction",
+            })
+          );
+        });
+      });
+  });
+  test("should give a 404 error if given a category that does not exist", () => {
+    return request(app)
+      .get("/api/reviews?category=football")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Resource not found");
+      });
+  });
+  test('should give a 400 error and respond "invalid sort query" if asked to sort by something that is not a valid column', () => {
+    return request(app)
+      .get("/api/reviews?sort_by=notColumn")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid sort query");
+      });
+  });
+  test('should give a 400 error and respond "invalid sort query" if asked to order by something other than asc or desc', () => {
+    return request(app)
+      .get("/api/reviews?order=notOrder")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid order query");
+      });
+  });
+});
+
+describe("GET /api/reviews/:review_id (comment count)", () => {
+  test("the review object should contain a comment count", () => {
+    return request(app)
+      .get("/api/reviews/2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.review).toEqual(
+          expect.objectContaining({
+            review_id: 2,
+            comment_count: "3",
+          })
+        );
+      });
+  });
+});
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should delete the given comment, give a status 204 and no content", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+});
