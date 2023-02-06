@@ -73,11 +73,7 @@ function deleteComment(req, res, next) {
 }
 
 function getEndpoints(req, res, next) {
-  selectEndpoints()
-    .then((endpoints) => {
-      res.status(200).send({ endpoints });
-    })
-    .catch(next);
+  res.status(200).send(selectEndpoints());
 }
 
 module.exports = {
