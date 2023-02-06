@@ -334,7 +334,7 @@ describe("PATCH /api/reviews/:review_id", () => {
   });
 });
 describe("GET /api/users", () => {
-  test("Status: 200 Should return an array of user objects with the correct prooperties", () => {
+  test("Status: 200 Should return an array of user objects with the correct properties", () => {
     return request(app)
       .get("/api/users")
       .expect(200)

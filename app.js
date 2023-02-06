@@ -9,6 +9,7 @@ const {
   patchReview,
   getUsers,
   deleteComment,
+  getEndpoints,
 } = require("./controllers/app.controllers");
 const {
   handleInvalidPath,
@@ -28,6 +29,7 @@ app.get("/api/users", getUsers);
 app.post("/api/reviews/:review_id/comments", postComment);
 app.patch("/api/reviews/:review_id", patchReview);
 app.delete("/api/comments/:comment_id", deleteComment);
+app.get("/api", getEndpoints);
 app.all("*", handleInvalidPath);
 
 app.use(handleCustomErrors);

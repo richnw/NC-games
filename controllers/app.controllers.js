@@ -7,6 +7,7 @@ const {
   updateReview,
   selectUsers,
   removeComment,
+  selectEndpoints,
 } = require("../models/app.models");
 
 function getCategories(req, res, next) {
@@ -71,6 +72,14 @@ function deleteComment(req, res, next) {
   removeComment(comment_id).then(() => res.status(204).send());
 }
 
+function getEndpoints(req, res, next) {
+  selectEndpoints()
+    .then((endpoints) => {
+      res.status(200).send({ endpoints });
+    })
+    .catch(next);
+}
+
 module.exports = {
   getCategories,
   getReviewById,
@@ -80,4 +89,5 @@ module.exports = {
   patchReview,
   getUsers,
   deleteComment,
+  getEndpoints,
 };

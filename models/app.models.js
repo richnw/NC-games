@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const { checkExists } = require("../db/seeds/utils");
+const endpoints = require("../endpoints.json");
 
 function selectCategories() {
   return db
@@ -108,6 +109,10 @@ function removeComment(comment_id) {
   return db.query("DELETE FROM comments WHERE comment_id = $1;", [comment_id]);
 }
 
+function selectEndpoints() {
+  return endpoints;
+}
+
 module.exports = {
   selectCategories,
   selectReview,
@@ -117,4 +122,5 @@ module.exports = {
   updateReview,
   selectUsers,
   removeComment,
+  selectEndpoints,
 };

@@ -9,7 +9,7 @@ exports.handlePsqlErrors = (err, req, res, next) => {
 };
 
 exports.handleInvalidPath = (req, res, next) => {
-  res.status(404).send({ msg: "The requested path was not found" }).catch(next);
+  res.status(404).send({ msg: "The requested path was not found" });
 };
 
 exports.handleCustomErrors = (err, req, res, next) => {
