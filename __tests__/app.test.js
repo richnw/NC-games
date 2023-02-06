@@ -467,3 +467,13 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app).delete("/api/comments/1").expect(204);
   });
 });
+describe("GET /api/", () => {
+  test("should return a JSON object of all available endpoints", () => {
+    return request(app)
+      .get("/api/")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toBeInstanceOf(Object);
+      });
+  });
+});
